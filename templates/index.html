@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{{ .team_name }} Scouting {{ .comp_year }}</title>
+  </head>
+  <body>
+      <form>
+          <div>
+              <h1>{{ .team_name }}<h1>
+              <img src="{{ .team_logo }}" alt="{{ .team_name }} logo" />
+          </div>
+
+          <br />
+          <br />
+          {{ range $section, $inputs := . }}
+          <div>{{ $section }}</div>
+          <br />
+            {{ range $input := $inputs }}
+            <div>
+                <label for="{{ $input.name }}" >{{ $input.name }}</label>
+                <input type="{{ $input.type }}" name=" {{ $input.name }} ">
+            </div>
+            {{ end }}
+            <br />
+          {{ end }}
+      </form>
+</html>

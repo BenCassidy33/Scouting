@@ -1,0 +1,42 @@
+# Example config for Scouting 2023-2024
+
+team_name = "Koibots 8230"
+logo = { type = "picture", link =" https://cdn.dorik.com/657a6e7daaf65f0029a89af7/659ddead015cb900110ece60/images/koitbotslogo_1fzn4re3.png" }
+comp_year = 2024
+
+[Prematch]
+initals = { name = "Initals", type = "text" }
+match_number = { name = "Match Number", type = "number" }
+starting_position = { name = "Starting Position", type = "select", options = ["Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"] }
+team_number = "number"
+no_show = "checkbox"
+
+[Autonomous]
+mobility = { name = "Mobility", type = "checkbox" }
+amp_scored = { name = "Amp Scored", type = "number" }
+amp_missed = { name = "Amp Missed", type = "number" }
+speaker_scored = { name = "Speaker Scored", type = "number" }
+speaker_missed = { name = "Speaker Missed", type = "number" }
+
+[Teleop]
+coop = { name = "Coopertition", type = "checkbox" }
+amp_scored = { name = "Amp Scored", type = "number" }
+amp_missed = { name = "Amp Missed", type = "number" }
+speaker_scored = { name = "Speaker Scored", type = "number" }
+speaker_missed = { name = "Speaker Missed", type = "number" }
+trap_scored = { name = "Trap Scored" , type = "number" }
+
+[Endgame]
+end_pos = { name = "End Position", type = "select", options = ["Climb", "Wing", "None"]}
+harmony = { name = "Harmony", type = "select", options = ["0", "2", "3"] }
+spotlight = { name = "Spotlight", type = "select", options = ["None", "Left", "Middle", "Right"] }
+
+[Postgame]
+offense_skill = { name = "Offense Skill", type = "select", options = ["1", "2", "3"] }
+defense_skill = { name = "Defense Skill", type = "select", options = ["1", "2", "3"] }
+was_defeneded = { name = "Was Defended", type = "checkbox" }
+died = { name = "Died", type = "checkbox" }
+tipped = { name = "Tipped", type = "checkbox" }
+card = { name = "Card", type = "select", options = ["None", "Yellow", "Red"] }
+foul_points = { name = "Foul Points", type = "number" }
+comments = { name = "Comments", type = "text" }

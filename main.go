@@ -1,17 +1,74 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
-	"net/http"
 	"os"
-	"time"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pelletier/go-toml"
 )
 
-func loadConfig() *toml.Tree {
-	file, err := os.ReadFile("config.toml")
+type ServerInfo struct {
+	ServerUptime string
+	Ping         string
+	Runtime      string
+}
+
+type Types struct {
+	types []reflect.Type
+}
+
+func validateServerConfig(cfg map[string]interface{}) {
+	// todo
+}
+
+func validateType(t string, types []string) bool {
+	for _, v := range types {
+		if v == t {
+			return true
+		}
+	}
+
+	return false
+}
+
+func valiateUserConfig(cfg map[string]interface{}, server_config map[string]interface{}) {
+	server_params := server_config["Paramaters"].(map[string]interface{})
+	types_unchecked := server_config["Input_Types"].(map[string]interface{})["types"]
+	typesSlice, ok := types_unchecked.([]interface{})
+
+	if !ok {
+		panic("Invalid Types: Expected 'types' to be a list of strings")
+	}
+
+	var types []string
+	for _, v := range typesSlice {
+		str, ok := v.(string)
+
+		if !ok {
+			panic("Invalid Types: not a string")
+		}
+
+		types = append(types, str)
+	}
+
+	for k, v := range cfg {
+		if reflect.TypeOf(v) != reflect.TypeOf(map[string]interface{}{}) {
+			if !server_params["allow_bare_inputs"].(bool) {
+				os.Stderr.WriteString(fmt.Sprintf("Invalid config key: %s\n", k))
+				os.Exit(1)
+			} else if !validateType(v.(string), types) {
+				os.Stderr.WriteString(fmt.Sprintf("Invalid config type: %s, at key: %s\n", v, k))
+				os.Exit(1)
+			}
+		}
+	}
+}
+
+func loadConfig(name string) *toml.Tree {
+	file, err := os.ReadFile(name)
 	if err != nil {
 		panic(err)
 	}
@@ -26,19 +83,16 @@ func loadConfig() *toml.Tree {
 
 func main() {
 	r := gin.Default()
+	user_config := loadConfig("config.toml").ToMap()
+	server_config := loadConfig("server.config.toml").ToMap()
+
+	// valiateServerConfig()
+	valiateUserConfig(user_config, server_config)
 
 	tmpl := template.Must(template.ParseGlob("templates/*"))
-	cfg := loadConfig()
 
 	r.GET("/", func(c *gin.Context) {
-		tmpl.ExecuteTemplate(c.Writer, "index.html", cfg.ToMap())
-	})
-
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message":    "pong",
-			"serverTime": time.Now(),
-		})
+		tmpl.ExecuteTemplate(c.Writer, "index.html", user_config)
 	})
 
 	r.Run(":8080")

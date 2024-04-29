@@ -1,0 +1,10 @@
+[Information]
+version = "0.1.0"
+timezone = "UTC-5:00"
+
+[Paramaters]
+allow_bare_inputs = true 
+
+[Input_Types] # DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING! (Used for config verification)
+types = ["string", "number", "picture", "select", "checkbox"]
+

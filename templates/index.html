@@ -1,24 +1,31 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>{{ .team_name }} Scouting {{ .comp_year }}</title>
-  </head>
-  <body>
-      <form>
-          <div>
-              <h1>{{ .team_name }}<h1>
-              <img src="{{ .team_logo }}" alt="{{ .team_name }} logo" />
-          </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/loading-states.js"></script>
+        <link rel="icon" type="image/x-icon", href="{{ .General.team_logo.link }}" />
+        <title>{{ .General.team_name }} Scouting {{ .General.comp_year }}</title>
+    </head>
+    <body>
 
-          <br />
-          <br />
-          {{ range $section, $inputs := . }}
-          <div>{{ $section }}</div>
-          <br />
+        <div>
+            <h1>{{ .General.team_name }}</h1>
+            <div>
+                <img src="{{ .General.team_logo.link }}" alt="{{ .General.team_name }} logo" />
+                <h2>FRC Robitics {{ .General.comp_year }}<h2>
+            </div>
+        </div>
+        <form>
+
+            <br />
+            <br />
+            {{ range $section, $inputs := . }}
+            {{ if ne $section "General" }}
+            <div>{{ $section }}</div>
+            <br />
             {{ range $input := $inputs }}
             <div>
                 <label for="{{ $input.name }}" >{{ $input.name }}</label>
@@ -26,6 +33,16 @@
             </div>
             {{ end }}
             <br />
-          {{ end }}
-      </form>
+            {{ end }}
+            {{ end }}
+        </form>
+
+        <div hx-get="/serverConnectionInformation" hx-swap="innerHTML" hx-trigger="load" >
+            <p class="htmx-indicator">Loading Server Connection... </p>
+        </div>
+        </div>
+        <br />
+        <br />
+        <br />
+    </body>
 </html>

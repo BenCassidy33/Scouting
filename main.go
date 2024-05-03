@@ -11,17 +11,13 @@ import (
 )
 
 type ServerInfo struct {
-	ServerUptime string
-	Ping         string
-	Runtime      string
+	version         string
+	server_timezone string
+	server_uptime   string
 }
 
 type Types struct {
 	types []reflect.Type
-}
-
-func validateServerConfig(cfg map[string]interface{}) {
-	// todo
 }
 
 func validateType(t string, types []string) bool {
@@ -89,10 +85,14 @@ func main() {
 	// valiateServerConfig()
 	valiateUserConfig(user_config, server_config)
 
-	tmpl := template.Must(template.ParseGlob("templates/*"))
+	tmpl := template.Must(template.ParseGlob("templates/*.html"))
 
 	r.GET("/", func(c *gin.Context) {
 		tmpl.ExecuteTemplate(c.Writer, "index.html", user_config)
+	})
+
+	r.GET("/server", func(c *gin.Context) {
+		c.JSON(200, gin.H{})
 	})
 
 	r.Run(":8080")

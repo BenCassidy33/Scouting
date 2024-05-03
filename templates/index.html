@@ -18,22 +18,32 @@
                 <h2>FRC Robitics {{ .General.comp_year }}<h2>
             </div>
         </div>
-        <form>
 
+        <form>
             <br />
             <br />
             {{ range $section, $inputs := . }}
-            {{ if ne $section "General" }}
-            <div>{{ $section }}</div>
-            <br />
-            {{ range $input := $inputs }}
-            <div>
-                <label for="{{ $input.name }}" >{{ $input.name }}</label>
-                <input type="{{ $input.type }}" name=" {{ $input.name }} ">
-            </div>
-            {{ end }}
-            <br />
-            {{ end }}
+                {{ if ne $section "General" }}
+                <div>{{ $section }}</div>
+                <br />
+                    {{ range $input := $inputs }}
+                        {{ if eq $input.type "select" }}
+                        <div>
+                            <label for="{{ $input.name }}" >{{ $input.name }}</label>
+                            <select name="{{ $input.name }}">
+                                {{ range $option := $input.options }}
+                                <option value="{{ $option }}">{{ $option }}</option>
+                                {{ end }}
+                            </select>
+                        {{ else }}
+                        <div>
+                            <label for="{{ $input.name }}" >{{ $input.name }}</label>
+                            <input type="{{ $input.type }}" name=" {{ $input.name }} ">
+                        </div>
+                        {{ end }}
+                    {{ end }}
+                <br />
+                {{ end }}
             {{ end }}
         </form>
 

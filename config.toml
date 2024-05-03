@@ -1,7 +1,5 @@
 # Example config for Scouting 2023-2024
 
-test = "test"
-
 [General] # DO NOT CHANGE THE NAME OF THIS SECTION (unless you want to change the code)
 team_name = "Koibots 8230"
 team_logo = { type = "picture", link = "https://avatars.githubusercontent.com/u/93792134?s=280&v=4" }

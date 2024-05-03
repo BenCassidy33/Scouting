@@ -1,10 +1,11 @@
-[Information]
+[Server_Information]
 version = "0.1.0"
-timezone = "UTC-5:00"
+server_timezone = "UTC-5:00"
 
 [Paramaters]
-allow_bare_inputs = true 
+allow_bare_inputs = true ### Boolean
+config_filetype = "toml" ### Toml / Json
 
-[Input_Types] # DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING! (Used for config verification)
+[Input_Types] # DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING! (Used for config verification as well as input creation)
 types = ["string", "number", "picture", "select", "checkbox"]
 

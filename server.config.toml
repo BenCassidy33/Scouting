@@ -1,6 +1,5 @@
 [Server_Information]
 version = "0.1.0"
-server_timezone = "UTC-5:00"
 
 [Paramaters]
 allow_bare_inputs = true ### Boolean

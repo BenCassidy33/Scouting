@@ -1,19 +1,29 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"net/http"
 	"os"
+	"os/exec"
 	"reflect"
+	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/pelletier/go-toml"
 )
 
+const (
+	toml_type = iota
+	json_type
+)
+
 type ServerInfo struct {
-	version         string
-	server_timezone string
-	server_uptime   string
+	GoVersion      string `json:"goVersion"`
+	ServerTimezone string `json:"serverTimezone`
+	ServerUptime   string `json:"serverUptime"`
+
+	ConfigInfo map[string]interface{} `json:"configInfo"`
 }
 
 type Types struct {
@@ -53,47 +63,79 @@ func valiateUserConfig(cfg map[string]interface{}, server_config map[string]inte
 	for k, v := range cfg {
 		if reflect.TypeOf(v) != reflect.TypeOf(map[string]interface{}{}) {
 			if !server_params["allow_bare_inputs"].(bool) {
-				os.Stderr.WriteString(fmt.Sprintf("Invalid config key: %s\n", k))
-				os.Exit(1)
+				panic(fmt.Sprintf("Invalid config key: %s\n", k))
 			} else if !validateType(v.(string), types) {
-				os.Stderr.WriteString(fmt.Sprintf("Invalid config type: %s, at key: %s\n", v, k))
-				os.Exit(1)
+				panic(fmt.Sprintf("Invalid config type: %s, at key: %s\n", v, k))
 			}
 		}
 	}
 }
 
-func loadConfig(name string) *toml.Tree {
+func loadConfig(name string, filetype int) map[string]interface{} {
 	file, err := os.ReadFile(name)
+	config := make(map[string]interface{})
 	if err != nil {
 		panic(err)
 	}
 
-	config, err := toml.Load(string(file))
-	if err != nil {
-		panic(err)
+	if filetype == toml_type {
+		c, err := toml.Load(string(file))
+		if err != nil {
+			panic(err)
+		}
+		config = c.ToMap()
+	} else if filetype == json_type {
+		err = json.Unmarshal(file, &config)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	return config
 }
 
 func main() {
-	r := gin.Default()
-	user_config := loadConfig("config.toml").ToMap()
-	server_config := loadConfig("server.config.toml").ToMap()
+	cmd := exec.Command("clear")
+	cmd.Stdout = os.Stdout
+	cmd.Run()
+
+	server_config := loadConfig("server.config.toml", toml_type)
+	user_config := make(map[string]interface{})
+
+	if server_config["Paramaters"].(map[string]interface{})["config_filetype"] == "json" {
+		if _, err := os.Stat("config.json"); err != nil {
+			panic("config.json not found")
+		}
+		user_config = loadConfig("config.json", json_type)
+	} else if server_config["Paramaters"].(map[string]interface{})["config_filetype"] == "toml" {
+		if _, err := os.Stat("config.toml"); err != nil {
+			panic("config.toml not found")
+		}
+		user_config = loadConfig("config.toml", toml_type)
+	} else {
+		panic("Invalid Config Type")
+	}
 
 	// valiateServerConfig()
 	valiateUserConfig(user_config, server_config)
-
 	tmpl := template.Must(template.ParseGlob("templates/*.html"))
 
-	r.GET("/", func(c *gin.Context) {
-		tmpl.ExecuteTemplate(c.Writer, "index.html", user_config)
-	})
+	router := http.NewServeMux()
+	server_start_time := time.Now()
+	fmt.Println("Server started at: ", server_start_time)
 
-	r.GET("/server", func(c *gin.Context) {
-		c.JSON(200, gin.H{})
-	})
+	router.Handle("GET /", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		Home(w, tmpl, user_config)
+	}))
 
-	r.Run(":8080")
+	router.Handle("GET /api/serverInfo", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		GetServerInfo(w, server_config, server_start_time)
+	}))
+
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	server.ListenAndServe()
 }

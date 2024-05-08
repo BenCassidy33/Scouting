@@ -1,3 +1,7 @@
 tmp/
 .air.toml
 build/
+.dockerignore
+Dockerfile
+edgedb.toml
+fly.toml

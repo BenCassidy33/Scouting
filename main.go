@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-	"os/exec"
 	"reflect"
 	"time"
 
@@ -41,12 +40,6 @@ func validateType(t string, types []string) bool {
 }
 
 func valiateUserConfig(cfg map[string]interface{}, server_config map[string]interface{}) {
-	entries, err := os.ReadDir("./")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(entries)
-
 	server_params := server_config["Paramaters"].(map[string]interface{})
 	types_unchecked := server_config["Input_Types"].(map[string]interface{})["types"]
 	typesSlice, ok := types_unchecked.([]interface{})
@@ -101,10 +94,6 @@ func loadConfig(name string, filetype int) map[string]interface{} {
 }
 
 func main() {
-	cmd := exec.Command("clear")
-	cmd.Stdout = os.Stdout
-	cmd.Run()
-
 	server_config := loadConfig("server.config.toml", toml_type)
 	user_config := make(map[string]interface{})
 
@@ -128,7 +117,6 @@ func main() {
 
 	router := http.NewServeMux()
 	server_start_time := time.Now()
-	fmt.Println("Server started at: ", server_start_time)
 
 	router.Handle("GET /", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		Home(w, tmpl, user_config)

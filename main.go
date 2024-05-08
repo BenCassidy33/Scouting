@@ -41,6 +41,12 @@ func validateType(t string, types []string) bool {
 }
 
 func valiateUserConfig(cfg map[string]interface{}, server_config map[string]interface{}) {
+	entries, err := os.ReadDir("./")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(entries)
+
 	server_params := server_config["Paramaters"].(map[string]interface{})
 	types_unchecked := server_config["Input_Types"].(map[string]interface{})["types"]
 	typesSlice, ok := types_unchecked.([]interface{})
